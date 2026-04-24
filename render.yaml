@@ -4,9 +4,10 @@ services:
     env: python
     buildCommand: |
       cd frontend && npm install && npm run build && cd ..
-      pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+      python -m pip install --upgrade pip setuptools wheel
+      # Pre-install a binary numpy wheel to avoid source builds on the host
+      python -m pip install numpy==1.23.5 --only-binary=:all:
+      python -m pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     plan: free
-    envVars:
-      - key: PORT
-        value: 10000
+    # Note: Set GROQ_API_KEY and other secrets in the Render dashboard (Environment).
