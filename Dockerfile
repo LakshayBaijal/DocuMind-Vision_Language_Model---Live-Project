@@ -1,12 +1,7 @@
 # Stage 1 — build frontend
 FROM node:18-alpine AS frontend-builder
 WORKDIR /app/frontend
-
-COPY frontend/package.json frontend/package-lock.json ./
-COPY frontend/tsconfig.json ./
-COPY frontend/vite.config.ts ./
-COPY frontend/src ./src
-
+COPY frontend/ ./
 RUN npm ci
 RUN npm run build
 
