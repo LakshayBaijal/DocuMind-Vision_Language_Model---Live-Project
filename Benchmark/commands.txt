@@ -1,0 +1,2 @@
+python Benchmark\run_benchmark_unlabeled.py --inspect
+python Benchmark\run_benchmark_unlabeled.py --base-url "https://documind-vision-language-model-live.onrender.com"

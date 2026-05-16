@@ -1,0 +1,17 @@
+metric,mean,min,max
+audit_coverage,0.3143,0.0000,1.0000
+consistency_checks_count,0.1714,0.0000,3.0000
+consistency_score,0.0238,0.0000,0.5000
+critical_low_conf_rate,0.7333,0.0000,1.0000
+entities_count,1.3714,0.0000,13.0000
+field_presence,0.4514,0.0000,1.0000
+key_value_count,2.6286,0.0000,13.0000
+mean_confidence,0.2775,0.0000,1.0000
+normalized_data_key_count,5.5714,0.0000,15.0000
+pii_bbox_valid_rate,0.6357,0.0000,1.0000
+pii_count,0.3143,0.0000,4.0000
+redaction_when_pii,0.6571,0.0000,1.0000
+schema_valid,0.6571,0.0000,1.0000
+structure_richness,0.5619,0.0000,1.0000
+overall_quality_score,41.1802,0.0000,84.2667
+http_success_rate,0.6571,,

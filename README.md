@@ -4,12 +4,6 @@ A full-stack AI-powered document extraction and verification system using FastAP
 
 ---
 
-
-## Live Project Link 
-```br
-https://documind-vision-language-model-live.onrender.com/
-```
-
 ## Features
 
 - **Document Extraction:** Upload an image of a document and extract structured fields (name, ID, DOB, summary, etc.).
@@ -149,4 +143,126 @@ npm run dev
           - key: PORT
             value: 10000
     ```
+5. Deploy! The backend will serve the built frontend at the root URL.
+
+---
+
+## Benchmark Results
+
+A quality benchmark was run on **35 document images** (from Wikimedia Commons and PaddleOCR test datasets) to assess extraction performance. Results use **proxy metrics** (no manual labels required) to evaluate schema validity, field coverage, confidence levels, and privacy redaction.
+
+### Overall Quality Summary
+
+| Metric | Value |
+|--------|-------|
+| **Total Images Processed** | 35 |
+| **Successfully Extracted** | 23 (65.7%) |
+| **HTTP Success Rate** | 65.7% |
+| **Mean Quality Score** | 41.18 / 100 |
+| **Quality Score Range** | 0–84.27 |
+| **Failed Extractions** | 12 (34.3%) |
+
+### Quality Metrics Breakdown
+
+Detailed aggregate statistics for 14 extraction quality indicators:
+
+| Metric | Mean | Min | Max | Notes |
+|--------|------|-----|-----|-------|
+| **schema_valid** | 0.657 | 0.0 | 1.0 | % of valid DocumentData objects |
+| **field_presence** | 0.451 | 0.0 | 1.0 | % of expected fields extracted |
+| **mean_confidence** | 0.278 | 0.0 | 1.0 | Avg confidence across all fields |
+| **critical_low_conf_rate** | 0.733 | 0.0 | 1.0 | % of fields with confidence < 0.5 |
+| **audit_coverage** | 0.314 | 0.0 | 1.0 | % of fields with audit trails |
+| **consistency_score** | 0.024 | 0.0 | 0.5 | Field-to-field consistency (0–1) |
+| **entities_count** | 1.37 | 0.0 | 13.0 | Avg # of entities extracted |
+| **key_value_count** | 2.63 | 0.0 | 13.0 | Avg # of key-value pairs |
+| **normalized_data_key_count** | 5.57 | 0.0 | 15.0 | Avg # of normalized fields |
+| **pii_bbox_valid_rate** | 0.636 | 0.0 | 1.0 | % of PII detections with valid bboxes |
+| **redaction_when_pii** | 0.657 | 0.0 | 1.0 | % of documents with PII correctly redacted |
+| **pii_count** | 0.314 | 0.0 | 4.0 | Avg PII regions per document |
+| **structure_richness** | 0.562 | 0.0 | 1.0 | Normalized data field coverage |
+| **consistency_checks_count** | 0.171 | 0.0 | 3.0 | Avg # of consistency validations |
+
+### Failed Extractions
+
+**12 documents failed** due to:
+- **HTTP 500 errors** (validation failure): Malformed API responses or schema violations
+- **Timeouts**: Large/multi-page documents exceeded Render's 60-second limit
+- **Empty/Null fields**: VLM could not infer structured data from low-quality or non-document images
+
+**Failed fixtures:**
+- Foreign Observer identification badge in the 1989 Namibian election
+- paddleocr_06_det_res_img_10_sast
+- paddleocr_13_e2e_res_img_10_pgnet
+- paddleocr_15_00111002
+- paddleocr_24_french_0
+- paddleocr_25_254
+- paddleocr_26_img623
+- paddleocr_27_img_12
+- paddleocr_28_det_res_img623_ct
+- paddleocr_29_en_3
+- paddleocr_30_img_10_east_starnet
+- Passport for a journey to France (1837)
+
+### Top-Performing Extractions
+
+**Highest quality score (84.27/100):** Francuska legitymacja pilota (Polish pilot license)
+- Schema: ✅ Valid
+- Fields: ✅ 100% coverage
+- Confidence: ✅ 88% average
+- PII Redaction: ✅ 3 regions detected & redacted
+- Normalized Fields: 13 keys
+
+**Other strong results (>70/100):**
+- Mislatel CPCN: 76.0/100
+- Luxembourg legitimation & proof of residency card: 52.0/100
+
+### Interpretation
+
+**Strengths:**
+- ✅ **PII Detection & Redaction:** 65.7% of documents correctly identify and blur sensitive information
+- ✅ **Schema Robustness:** 65.7% of responses pass Pydantic validation
+- ✅ **Normalized Field Extraction:** 5.57 fields extracted on average (good for structured queries)
+
+**Areas for Improvement:**
+- ⚠️ **Field Confidence:** Mean confidence is only 27.8% (73.3% of fields have confidence < 0.5)
+  - **Action:** Consider confidence-based filtering or multi-pass verification for production use
+- ⚠️ **Completeness:** Only 45.1% of expected fields extracted on average
+  - **Action:** Improve VLM prompt engineering to cover more field types
+- ⚠️ **Consistency:** Low consistency between extracted and normalized fields
+  - **Action:** Strengthen normalization heuristics in `vlm_service.py`
+
+### How to Run Benchmarks
+
+**Unlabeled Benchmark (Recommended):**
+```powershell
+cd Benchmark
+python run_benchmark_unlabeled.py --base-url "https://documind-vision-language-model-live.onrender.com"
+```
+Results saved to `results/summary_unlabeled.json`, `summary_unlabeled.csv`, and `predictions_unlabeled.jsonl`.
+
+**Labeled Benchmark (Requires Ground-Truth Labels):**
+```powershell
+cd Benchmark
+python run_benchmark_unlabeled.py --base-url "https://documind-vision-language-model-live.onrender.com"
+```
+Requires JSON ground-truth files in `data/labels/` matching image names; computes F1/precision/recall per field.
+
+**Download Test Documents:**
+```powershell
+cd Benchmark
+python download_random_documents.py --count 30
+```
+Fetches 30 random document images from Wikimedia Commons and PaddleOCR.
+
+---
+
+## Notes
+
+- Do **not** commit `.env` or `frontend/dist/`.
+- All API and static frontend are served from the same Render service.
+- For troubleshooting, check Render logs and ensure Python 3.11 is used.
+- Benchmark results are based on **Render's free tier** which has rate-limiting and cold-start delays; production deployments will show improved reliability.
+
+---
 
