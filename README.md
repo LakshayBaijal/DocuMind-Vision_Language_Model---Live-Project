@@ -256,13 +256,3 @@ python download_random_documents.py --count 30
 Fetches 30 random document images from Wikimedia Commons and PaddleOCR.
 
 ---
-
-## Notes
-
-- Do **not** commit `.env` or `frontend/dist/`.
-- All API and static frontend are served from the same Render service.
-- For troubleshooting, check Render logs and ensure Python 3.11 is used.
-- Benchmark results are based on **Render's free tier** which has rate-limiting and cold-start delays; production deployments will show improved reliability.
-
----
-
